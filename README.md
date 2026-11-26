@@ -1,8 +1,8 @@
 # Marketplace Discovery & Recommendation Engine — Product Analytics Case Study
 
-![Dashboard KPIs & Benchmark Table](assets/dashboard_preview1.png)
+![Dashboard KPIs & Benchmark Table](assets/dashboard_preview.png)
 
-![Ranking Charts & Hybrid Routing Architecture](assets/dashboard_preview.png)
+![Ranking Charts & Hybrid Routing Architecture](assets/dashboard_preview1.png)
 
 An end-to-end **Product Analytics & Machine Learning Evaluation** case study diagnosing top-of-funnel discovery friction on **2.76M e-commerce clickstream events** (Retail Rocket) and designing a segment-routed recommendation strategy backed by a sized A/B experiment.
 
@@ -47,19 +47,46 @@ All ranking metrics are evaluated at **$K = 10$** and averaged across **$U_{\tex
 
 ---
 
-## 4. Repository Structure
+## 4. Proposed Online A/B Experiment Design
+* **Hypothesis & Routing:** Replacing static Popularity with Segment-Routed Hybrid recommendations (Popularity on zero-history landings $\rightarrow$ real-time Item-to-Item CF after $\ge 1$ in-session view) will lift session-level View $\rightarrow$ Add-to-Cart conversion by $\ge 10\%$ relative (`2.69%` $\rightarrow$ `2.96%`).
+* **Sample Size & Duration:** `~196,000` unique visitors per variant (`~392,000` total) over **42 days (6 weeks)** at $\alpha = 0.05$, $80\%$ power, accounting for weekly seasonality.
+* **Primary & Secondary Metrics:** Primary = **View $\rightarrow$ Add-to-Cart Conversion Rate**; Secondary = **View $\rightarrow$ Purchase Conversion Rate** and **Items Added per Session**.
+* **Guardrails:** Recommendation API p95 latency (`< 100 ms`), out-of-stock click rate, and Cart $\rightarrow$ Purchase completion rate (`31.07%` baseline).
+
+---
+
+## 5. Limitations & Production Next Steps
+* **Hashed Metadata Constraint:** Retail Rocket hashes item properties (`categoryid`, `available`) and omits price, margin, and inventory velocity; production ranking would incorporate price-band affinity, seller reliability, and margin weighting.
+* **Offline-to-Online Gap:** Offline hit-rate metrics (`NDCG@10`, `MRR@10`) measure historical intent recovery under an existing UI and cannot capture presentation bias or novelty fatigue without the online A/B experiment above.
+
+---
+
+## 6. Repository Structure
 * `notebooks/01_eda_and_funnel.ipynb` — Clickstream schema audit, funnel conversion diagnosis, and visitor sparsity analysis.
 * `notebooks/02_model_benchmark_and_segments.ipynb` — Temporal train/test split, model training, and cohort-segmented evaluation.
 * `src/data_prep.py` — Timestamp parsing, chronological splitting, and 7-day forward ground-truth construction.
 * `src/models.py` — Popularity baseline, cosine Item-to-Item Collaborative Filtering, and TruncatedSVD latent factor models.
 * `src/metrics.py` — Vectorized Precision@K, Recall@K, NDCG@K, MAP@K, MRR@K, Catalog Coverage, and Category Diversity evaluators.
 * `app.py` — Interactive Streamlit product analytics dashboard for exploring segment trade-offs.
-* `reports/product_decision_memo.md` — Executive product decision memo with a sized 6-week A/B experiment (~196K visitors/variant, 80% power, $\alpha = 0.05$, 10% relative MDE) and guardrail metrics.
+* `reports/product_decision_memo.md` — Executive product decision memo detailing the rollout strategy and A/B test sizing.
 
 ---
 
-## 5. Setup & Local Execution
+## 7. Setup & Local Execution
 1. **Clone the repository:**
    ```bash
    git clone [https://github.com/Pujitha-Gedela/marketplace-discovery-recs.git](https://github.com/Pujitha-Gedela/marketplace-discovery-recs.git)
    cd marketplace-discovery-recs
+
+**Create a virtual environment and install dependencies:**
+python -m venv .venv
+# Windows PowerShell:
+.\.venv\Scripts\Activate.ps1
+# macOS / Linux:
+# source .venv/bin/activate
+pip install -r requirements.txt
+
+**Launch the Streamlit dashboard:**
+streamlit run app.py
+
+(Optional) To re-run the full notebooks from scratch, download the public Retail Rocket Recommender System Dataset (events.csv, item_properties_part1.csv, item_properties_part2.csv, category_tree.csv) into data/raw/.
