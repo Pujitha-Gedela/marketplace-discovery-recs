@@ -1,6 +1,8 @@
 # Marketplace Discovery & Recommendation Engine — Product Analytics Case Study
 
-![Dashboard Preview](assets/dashboard_preview.png)
+![Dashboard KPIs & Benchmark Table](assets/dashboard_preview1.png)
+
+![Ranking Charts & Hybrid Routing Architecture](assets/dashboard_preview.png)
 
 An end-to-end **Product Analytics & Machine Learning Evaluation** case study diagnosing top-of-funnel discovery friction on **2.76M e-commerce clickstream events** (Retail Rocket) and designing a segment-routed recommendation strategy backed by a sized A/B experiment.
 
